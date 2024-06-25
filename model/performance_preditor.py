@@ -2,25 +2,28 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 import numpy as np
+import math
 
 
 class PositionalEncoder(nn.Module):
     """位置编码"""
 
-    def __init__(self, num_hiddens, dropout=0, max_len=1000):
+    def __init__(self, num_hiddens, max_len=1000):
         super(PositionalEncoder, self).__init__()
-        self.dropout = nn.Dropout(dropout)
-        # 创建一个足够长的P
-        self.P = torch.zeros((max_len, num_hiddens))
-        X = (torch.arange(max_len, dtype=torch.float32).reshape(-1, 1)
-             / torch.pow(10000, torch.arange(0, num_hiddens, 2, dtype=torch.float32)
-                         / num_hiddens))
-        self.P[:, 0::2] = torch.sin(X)
-        self.P[:, 1::2] = torch.cos(X)
 
-    def forward(self, X):
-        X = self.P[:X.shape[1], :]
-        return self.dropout(X)
+        # 创建位置编码矩阵
+        self.pe = torch.zeros(max_len, num_hiddens)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, num_hiddens, 2).float() * (-math.log(10000.0) / num_hiddens))
+        self.pe[:, 0::2] = torch.sin(position * div_term)
+        self.pe[:, 1::2] = torch.cos(position * div_term)
+
+        # 不需要梯度
+        self.pe.requires_grad = False
+
+    def forward(self, x):
+        self.pe = self.pe.to(x.device)
+        return x + self.pe[:x.size(1), :]
 
 
 class LayerPruneEncoder(nn.Module):
@@ -31,7 +34,7 @@ class LayerPruneEncoder(nn.Module):
     # def forward(self, X):
     #     return self.P[:X.shape[0]] * X[:, None]
 
-    def __init__(self, embed_size, max_len=1000):
+    def __init__(self, embed_size):
         super(LayerPruneEncoder, self).__init__()
         self.encode = nn.Linear(1, embed_size)
 
@@ -47,12 +50,12 @@ class LayerRankEncoder(nn.Module):
     # def forward(self, X):
     #     return self.P[:X.shape[0]] * X[:, None]
 
-    def __init__(self, embed_size, max_len=1000):
+    def __init__(self, embed_size):
         super(LayerRankEncoder, self).__init__()
         self.encode = nn.Linear(1, embed_size)
 
-    def forward(self, X):
-        return self.encode(X)
+    def forward(self, x):
+        return self.encode(x)
 
 
 class LayerInfoEncoder(nn.Module):
@@ -74,9 +77,9 @@ class PerformancePredictor(nn.Module):
 
         self.input_size = prune_size + rank_size + layer_size
 
-        self.pos_encoder = PositionalEncoder(num_hiddens=self.input_size)
+        self.pos_encoder = PositionalEncoder(num_hiddens=self.input_size).to("cuda:0")
         self.prune_encoder = LayerPruneEncoder(embed_size=prune_size)
-        self.rank_encoder = LayerPruneEncoder(embed_size=rank_size)
+        self.rank_encoder = LayerRankEncoder(embed_size=rank_size)
         self.info_encoder = LayerInfoEncoder(output_size=layer_size)
 
         self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=hidden_size, num_layers=num_layers,
@@ -85,30 +88,21 @@ class PerformancePredictor(nn.Module):
         self.output = nn.Linear(in_features=hidden_size, out_features=task_size)
 
     # 需要优化
-    def get_input_embedding(self, x):
-        (layer_info, rank, prune_rate) = x
-
-        batch = rank.shape[0]
-        seq_length = rank.shape[1]
-        pos = np.zeros((batch, seq_length, self.input_size))
-
+    def get_input_embedding(self, layer_info, rank_list, prune_list):
         layer_encoding = self.info_encoder(layer_info)
         layer_encoding = layer_encoding.squeeze(2)
-        rank_encoding = self.rank_encoder(rank)
-        prune_encoding = self.prune_encoder(prune_rate)
+        rank_encoding = self.rank_encoder(rank_list)
+        prune_encoding = self.prune_encoder(prune_list)
 
-        pos_encoding = self.pos_encoder(pos)
-        pos_encoding = pos_encoding.repeat(batch, 1, 1)
-
-        embedding = pos_encoding + torch.cat((prune_encoding, rank_encoding, layer_encoding), dim=2)
-        print(embedding.shape)
+        embedding = torch.cat((prune_encoding, rank_encoding, layer_encoding), dim=2)
+        embedding = self.pos_encoder(embedding)
 
         return embedding
 
-    def forward(self, x):
+    def forward(self, layer_info, rank_list, prune_list):
         # input x = [batch, seq_len, input_size]
 
-        x = self.get_input_embedding(x)
+        x = self.get_input_embedding(layer_info, rank_list, prune_list)
         x = self.att_scaled_dot_seq_len(x)
         x, _ = self.lstm(x)
         x = self.output(x)
@@ -128,16 +122,17 @@ class PerformancePredictor(nn.Module):
 
 
 if __name__ == "__main__":
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     batch_size = 64
     seq_length = 32
 
     ranks = [[2] for i in range(seq_length)]
     prunes = [[0.5] for i in range(seq_length)]
 
-    layer_info = torch.randn(batch_size, seq_length, 6, 4096).to(torch.float32)
-    rank_list = torch.tensor([ranks for i in range(batch_size)], dtype=torch.float32)
-    prune_list = torch.tensor([prunes for i in range(batch_size)], dtype=torch.float32)
+    layer_info = torch.randn(batch_size, seq_length, 6, 4096).to(torch.double).to(device)
+    rank_list = torch.tensor([ranks for i in range(batch_size)]).to(torch.double).to(device)
+    prune_list = torch.tensor([prunes for i in range(batch_size)]).to(torch.double).to(device)
 
-    predictor = PerformancePredictor()
-    result = predictor((layer_info, rank_list, prune_list))
+    predictor = PerformancePredictor().double().to(device)
+    result = predictor(layer_info, rank_list, prune_list)
     print(result)
