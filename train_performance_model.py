@@ -51,7 +51,7 @@ for epoch in range(num_epoch):
 
         output = net(layer_info, rank_list, prune_list)
 
-        loss = criterion(output, performance)
+        loss = criterion(output, performance) * 10
 
         loss.backward()
         optimizer.step()
