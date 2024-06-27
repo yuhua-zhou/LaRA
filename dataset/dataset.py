@@ -23,7 +23,7 @@ class PerformanceDataset(Dataset):
         ]
 
         def read_layer_info(path):
-            layer_info = np.load("./LLM-Pruner/prune_log/local/" + path + "/svd.npy", allow_pickle=True)
+            layer_info = np.load("./rankadaptor/prune_log/local/" + path + "/svd.npy", allow_pickle=True)
             layer_info = layer_info.tolist()
             new_info = []
 

@@ -51,7 +51,7 @@ for epoch in range(num_epoch):
 
         output = net(layer_info, rank_list, prune_list)
 
-        loss = criterion(output, performance) * 10
+        loss = criterion(output, performance)
 
         loss.backward()
         optimizer.step()
@@ -63,6 +63,8 @@ for epoch in range(num_epoch):
     loss_list.append(running_loss)
 
 draw_loss_plot(range(num_epoch), loss_list)
+torch.save(net.state_dict(), "./output/performance_weights.pth")
+
 
 # a = [-0.0023, -0.0580, -0.0099, 0.1217, -0.1391, 0.0885, 0.0452]
 # b = [0.6768, 0.3805, 0.6385, 0.4080, 0.5651, 0.7709, 0.6732]
