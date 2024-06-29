@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from performance_preditor import PerformancePredictor
 
 
 class PolicyNetwork(nn.Module):
@@ -17,21 +16,34 @@ class PolicyNetwork(nn.Module):
 
 
 class NASEnvironment:
-    def __init__(self, action_space):
+    def __init__(self, action_space, predictor, scale_factor=100):
         super().__init__()
         self.action_space = action_space
+        self.scale_factor = scale_factor
+        self.predictor = predictor
 
-    def step(self, actions):
+    def step(self, actions, layer_info, prune_list):
         ranks = [self.action_space[i] for i in actions.detach()]
+        print(ranks)
+        ranks = torch.tensor(ranks, dtype=torch.float64).unsqueeze(1)
 
         # 在这里评估架构性能,并返回奖励信号
-        reward = self.evaluate_architecture(ranks)
+        reward = self.evaluate_architecture(ranks, layer_info, prune_list)
         return reward
 
-    def evaluate_architecture(self, ranks):
-        print(ranks)
-        print(sum(ranks))
-        return torch.sum(torch.tensor(ranks))
+    def evaluate_architecture(self, rank_list, layer_info, prune_list):
+        rank_list = rank_list.unsqueeze(0)
+        layer_info = layer_info.unsqueeze(0)
+        prune_list = prune_list.unsqueeze(0)
+
+        # print(rank_list.shape)
+        # print(layer_info.shape)
+        # print(prune_list.shape)
+
+        output = self.predictor(layer_info, rank_list, prune_list)
+        reward = torch.sum(output)
+
+        return self.scale_factor * reward - torch.sum(torch.tensor(rank_list))
 
 
 class NASAgent:
@@ -45,41 +57,17 @@ class NASAgent:
         logits = self.policy_net(state)
         probs = F.softmax(logits, dim=1)
         actions = probs.multinomial(num_samples=1)
-        return logits, actions
+        return probs, actions
 
     def update_policy(self, log_logits, rewards):
         discounted_rewards = rewards / log_logits.shape[0]
 
         policy_loss = -(discounted_rewards * log_logits).mean()
-        print(policy_loss)
+        # print(policy_loss)
 
         self.optimizer.zero_grad()
-        policy_loss.backward()
+        # 为什么需要加这句话？ 之前好像都不需要？
+        policy_loss.backward(retain_graph=True)
         self.optimizer.step()
 
-
-action_space = [2, 4, 6, 8, 10, 12, 14, 16]
-num_episode = 10
-num_epoch = 100
-
-policy_net = PolicyNetwork(32, 64, len(action_space))
-env = NASEnvironment(action_space)
-agent = NASAgent(policy_net, env)
-
-for epoch in range(num_epoch):
-    for episode in range(num_episode):
-        state = torch.zeros(10, 32)
-        logits, actions = agent.select_action(state)
-        reward = env.step(actions)
-
-        log_logits = logits.gather(1, actions).squeeze(1)
-        agent.update_policy(log_logits, reward)
-
-# policy_net = PolicyNetwork(32, 64, len(search_space))
-# dummy_input = torch.randn(32, 32)
-# output = policy_net(dummy_input)
-# print(output.shape)
-# probs = F.softmax(output, dim=1)
-# print(probs.shape)
-# action = probs.multinomial(num_samples=1)
-# print(action)
+        return policy_loss

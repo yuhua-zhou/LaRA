@@ -10,7 +10,7 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="root@connect.bjc1.seetacloud.com:57315 password">
+      <paths name="v100">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
