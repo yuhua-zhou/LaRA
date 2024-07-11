@@ -2,90 +2,37 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 import numpy as np
-import math
-
-
-class PositionalEncoder(nn.Module):
-    """位置编码"""
-
-    def __init__(self, num_hiddens, max_len=1000):
-        super(PositionalEncoder, self).__init__()
-
-        # 创建位置编码矩阵
-        self.pe = torch.zeros(max_len, num_hiddens)
-        position = torch.arange(0, max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, num_hiddens, 2).float() * (-math.log(10000.0) / num_hiddens))
-        self.pe[:, 0::2] = torch.sin(position * div_term)
-        self.pe[:, 1::2] = torch.cos(position * div_term)
-
-        # 不需要梯度
-        self.pe.requires_grad = False
-
-    def forward(self, x):
-        self.pe = self.pe.to(x.device)
-        return x + self.pe[:x.size(1), :]
-
-
-class LayerPruneEncoder(nn.Module):
-    # def __init__(self, embed_size, max_len=1000):
-    #     super(LayerPruneEncoder, self).__init__()
-    #     self.P = torch.ones((max_len, embed_size))
-    #
-    # def forward(self, X):
-    #     return self.P[:X.shape[0]] * X[:, None]
-
-    def __init__(self, embed_size):
-        super(LayerPruneEncoder, self).__init__()
-        self.encode = nn.Linear(1, embed_size)
-
-    def forward(self, x):
-        return self.encode(x)
-
-
-class LayerRankEncoder(nn.Module):
-    # def __init__(self, embed_size, max_len=1000):
-    #     super(LayerRankEncoder, self).__init__()
-    #     self.P = torch.ones((1, max_len, embed_size))
-    #
-    # def forward(self, X):
-    #     return self.P[:X.shape[0]] * X[:, None]
-
-    def __init__(self, embed_size):
-        super(LayerRankEncoder, self).__init__()
-        self.encode = nn.Linear(1, embed_size)
-
-    def forward(self, x):
-        return self.encode(x)
-
-
-class LayerInfoEncoder(nn.Module):
-    def __init__(self, output_size):
-        super(LayerInfoEncoder, self).__init__()
-        self.down_sample = nn.AdaptiveAvgPool2d((1, output_size))
-        self.encode = nn.Linear(output_size, output_size)
-
-    def forward(self, x):
-        x = self.down_sample(x)
-        x = self.encode(x)
-        return x
+from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, LayerRankEncoder
+from .attention_fusion import FeatureFusion
 
 
 class PerformancePredictor(nn.Module):
-    def __init__(self, prune_size=16, rank_size=16, layer_size=32,
-                 hidden_size=128, num_layers=2, task_size=7):
+    def __init__(self, input_size=64, hidden_size=128, num_layers=2, num_tasks=7):
         super(PerformancePredictor, self).__init__()
 
-        self.input_size = prune_size + rank_size + layer_size
+        # encoders
+        self.pos_encoder = PositionalEncoder(num_hiddens=input_size)
+        self.prune_encoder = LayerPruneEncoder(embed_size=input_size)
+        self.rank_encoder = LayerRankEncoder(embed_size=input_size)
+        self.info_encoder = LayerInfoEncoder(output_size=input_size)
 
-        self.pos_encoder = PositionalEncoder(num_hiddens=self.input_size).to("cuda:0")
-        self.prune_encoder = LayerPruneEncoder(embed_size=prune_size)
-        self.rank_encoder = LayerRankEncoder(embed_size=rank_size)
-        self.info_encoder = LayerInfoEncoder(output_size=layer_size)
+        # feature fuser
+        self.fuser = FeatureFusion(embedding_dim=input_size)
 
-        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=hidden_size, num_layers=num_layers,
-                            batch_first=True)
+        # lstm
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers,
+                            batch_first=True, bidirectional=False)
         # self.attention = nn.Linear(64, t)
-        self.output = nn.Linear(in_features=hidden_size, out_features=task_size)
+
+        # relu activate
+        self.relu = nn.ReLU()
+
+        # task heads
+        self.task_heads = nn.ModuleList([
+            nn.Linear(in_features=hidden_size, out_features=1) for _ in range(num_tasks)
+        ])
+
+        self.output = nn.Linear(in_features=hidden_size, out_features=num_tasks)
 
     # 需要优化
     def get_input_embedding(self, layer_info, rank_list, prune_list):
@@ -94,7 +41,8 @@ class PerformancePredictor(nn.Module):
         rank_encoding = self.rank_encoder(rank_list)
         prune_encoding = self.prune_encoder(prune_list)
 
-        embedding = torch.cat((prune_encoding, rank_encoding, layer_encoding), dim=2)
+        embedding = torch.stack([prune_encoding, rank_encoding, layer_encoding], dim=2)
+        embedding = self.fuser(embedding)
         embedding = self.pos_encoder(embedding)
 
         return embedding
@@ -105,8 +53,16 @@ class PerformancePredictor(nn.Module):
         x = self.get_input_embedding(layer_info, rank_list, prune_list)
         x = self.att_scaled_dot_seq_len(x)
         x, _ = self.lstm(x)
-        x = self.output(x)
-        return x[:, -1, :]
+
+        # 只取lstm最后一层输出
+        x = x[:, -1, :]
+        x = self.relu(x)
+
+        output = torch.cat([
+            task_head(x) for task_head in self.task_heads
+        ], dim=1)
+
+        return output
 
     def att_scaled_dot_seq_len(self, x):
         # b, s, input_size / b, s, hidden_size
@@ -135,4 +91,5 @@ if __name__ == "__main__":
 
     predictor = PerformancePredictor().double().to(device)
     result = predictor(layer_info, rank_list, prune_list)
+    print(result.shape)
     print(result)
