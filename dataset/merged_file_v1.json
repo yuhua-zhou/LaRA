@@ -72,7 +72,7 @@
     "performance": {
       "arc_easy": 0.6393,
       "arc_challenge": 0.3567,
-      "windograde": 0.6133,
+      "winogrande": 0.6133,
       "openbookqa": 0.406,
       "boolq": 0.5034,
       "piqa": 0.7524,
@@ -152,7 +152,7 @@
     "performance": {
       "arc_easy": 0.6347,
       "arc_challenge": 0.3567,
-      "windograde": 0.6038,
+      "winogrande": 0.6038,
       "openbookqa": 0.296,
       "boolq": 0.578,
       "piqa": 0.7535,
@@ -232,7 +232,7 @@
     "performance": {
       "arc_easy": 0.6313,
       "arc_challenge": 0.3584,
-      "windograde": 0.6062,
+      "winogrande": 0.6062,
       "openbookqa": 0.404,
       "boolq": 0.4859,
       "piqa": 0.7519,
@@ -312,7 +312,7 @@
     "performance": {
       "arc_easy": 0.6423,
       "arc_challenge": 0.3567,
-      "windograde": 0.6046,
+      "winogrande": 0.6046,
       "openbookqa": 0.412,
       "boolq": 0.6162,
       "piqa": 0.7497,
@@ -392,7 +392,7 @@
     "performance": {
       "arc_easy": 0.6292,
       "arc_challenge": 0.3592,
-      "windograde": 0.6077,
+      "winogrande": 0.6077,
       "openbookqa": 0.41,
       "boolq": 0.5251,
       "piqa": 0.7546,
@@ -472,7 +472,7 @@
     "performance": {
       "arc_easy": 0.633,
       "arc_challenge": 0.3601,
-      "windograde": 0.6101,
+      "winogrande": 0.6101,
       "openbookqa": 0.4,
       "boolq": 0.585,
       "piqa": 0.7568,
@@ -552,7 +552,7 @@
     "performance": {
       "arc_easy": 0.6242,
       "arc_challenge": 0.3507,
-      "windograde": 0.6196,
+      "winogrande": 0.6196,
       "openbookqa": 0.412,
       "boolq": 0.5193,
       "piqa": 0.7617,
@@ -632,7 +632,7 @@
     "performance": {
       "arc_easy": 0.6326,
       "arc_challenge": 0.3558,
-      "windograde": 0.6054,
+      "winogrande": 0.6054,
       "openbookqa": 0.408,
       "boolq": 0.5814,
       "piqa": 0.7595,
@@ -712,7 +712,7 @@
     "performance": {
       "arc_easy": 0.6313,
       "arc_challenge": 0.3507,
-      "windograde": 0.6085,
+      "winogrande": 0.6085,
       "openbookqa": 0.402,
       "boolq": 0.526,
       "piqa": 0.7557,
@@ -792,7 +792,7 @@
     "performance": {
       "arc_easy": 0.6258,
       "arc_challenge": 0.3635,
-      "windograde": 0.6077,
+      "winogrande": 0.6077,
       "openbookqa": 0.406,
       "boolq": 0.5792,
       "piqa": 0.7546,
@@ -2152,7 +2152,7 @@
     "performance": {
       "arc_easy": 0.673,
       "arc_challenge": 0.3771,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.404,
       "boolq": 0.5777,
       "piqa": 0.7758,
@@ -2232,7 +2232,7 @@
     "performance": {
       "arc_easy": 0.6768,
       "arc_challenge": 0.3805,
-      "windograde": 0.6385,
+      "winogrande": 0.6385,
       "openbookqa": 0.408,
       "boolq": 0.5651,
       "piqa": 0.7709,
@@ -2312,7 +2312,7 @@
     "performance": {
       "arc_easy": 0.673,
       "arc_challenge": 0.3771,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.404,
       "boolq": 0.5777,
       "piqa": 0.7758,
@@ -2392,7 +2392,7 @@
     "performance": {
       "arc_easy": 0.6734,
       "arc_challenge": 0.3737,
-      "windograde": 0.6369,
+      "winogrande": 0.6369,
       "openbookqa": 0.404,
       "boolq": 0.5098,
       "piqa": 0.7726,
@@ -2472,7 +2472,7 @@
     "performance": {
       "arc_easy": 0.6599,
       "arc_challenge": 0.3695,
-      "windograde": 0.6425,
+      "winogrande": 0.6425,
       "openbookqa": 0.41,
       "boolq": 0.5673,
       "piqa": 0.7726,
@@ -2552,7 +2552,7 @@
     "performance": {
       "arc_easy": 0.6755,
       "arc_challenge": 0.3695,
-      "windograde": 0.6401,
+      "winogrande": 0.6401,
       "openbookqa": 0.404,
       "boolq": 0.541,
       "piqa": 0.7715,
@@ -2632,7 +2632,7 @@
     "performance": {
       "arc_easy": 0.6832,
       "arc_challenge": 0.3788,
-      "windograde": 0.6354,
+      "winogrande": 0.6354,
       "openbookqa": 0.4,
       "boolq": 0.5138,
       "piqa": 0.7726,
@@ -2712,7 +2712,7 @@
     "performance": {
       "arc_easy": 0.67,
       "arc_challenge": 0.3746,
-      "windograde": 0.6251,
+      "winogrande": 0.6251,
       "openbookqa": 0.406,
       "boolq": 0.6,
       "piqa": 0.7715,
@@ -2792,7 +2792,7 @@
     "performance": {
       "arc_easy": 0.6646,
       "arc_challenge": 0.3677,
-      "windograde": 0.6354,
+      "winogrande": 0.6354,
       "openbookqa": 0.406,
       "boolq": 0.6119,
       "piqa": 0.7688,
@@ -2872,7 +2872,7 @@
     "performance": {
       "arc_easy": 0.6717,
       "arc_challenge": 0.3643,
-      "windograde": 0.6306,
+      "winogrande": 0.6306,
       "openbookqa": 0.412,
       "boolq": 0.5899,
       "piqa": 0.7693,
@@ -2952,7 +2952,7 @@
     "performance": {
       "arc_easy": 0.6641,
       "arc_challenge": 0.372,
-      "windograde": 0.6346,
+      "winogrande": 0.6346,
       "openbookqa": 0.402,
       "boolq": 0.4847,
       "piqa": 0.7573,
@@ -3032,7 +3032,7 @@
     "performance": {
       "arc_easy": 0.6595,
       "arc_challenge": 0.3746,
-      "windograde": 0.6401,
+      "winogrande": 0.6401,
       "openbookqa": 0.412,
       "boolq": 0.5982,
       "piqa": 0.7693,
@@ -3112,7 +3112,7 @@
     "performance": {
       "arc_easy": 0.6439,
       "arc_challenge": 0.366,
-      "windograde": 0.6046,
+      "winogrande": 0.6046,
       "openbookqa": 0.41,
       "boolq": 0.5034,
       "piqa": 0.7601,
@@ -3192,7 +3192,7 @@
     "performance": {
       "arc_easy": 0.5901,
       "arc_challenge": 0.3379,
-      "windograde": 0.6062,
+      "winogrande": 0.6062,
       "openbookqa": 0.388,
       "boolq": 0.5881,
       "piqa": 0.7437,
@@ -3272,7 +3272,7 @@
     "performance": {
       "arc_easy": 0.5985,
       "arc_challenge": 0.3396,
-      "windograde": 0.5983,
+      "winogrande": 0.5983,
       "openbookqa": 0.394,
       "boolq": 0.5694,
       "piqa": 0.7508,
@@ -3352,7 +3352,7 @@
     "performance": {
       "arc_easy": 0.5863,
       "arc_challenge": 0.3464,
-      "windograde": 0.603,
+      "winogrande": 0.603,
       "openbookqa": 0.376,
       "boolq": 0.5813,
       "piqa": 0.7541,
@@ -3432,7 +3432,7 @@
     "performance": {
       "arc_easy": 0.6094,
       "arc_challenge": 0.3481,
-      "windograde": 0.6022,
+      "winogrande": 0.6022,
       "openbookqa": 0.39,
       "boolq": 0.5758,
       "piqa": 0.7557,
@@ -3512,7 +3512,7 @@
     "performance": {
       "arc_easy": 0.5972,
       "arc_challenge": 0.3422,
-      "windograde": 0.6093,
+      "winogrande": 0.6093,
       "openbookqa": 0.384,
       "boolq": 0.5841,
       "piqa": 0.7454,
@@ -3592,7 +3592,7 @@
     "performance": {
       "arc_easy": 0.5972,
       "arc_challenge": 0.3481,
-      "windograde": 0.6101,
+      "winogrande": 0.6101,
       "openbookqa": 0.3394,
       "boolq": 0.5789,
       "piqa": 0.7514,
@@ -3672,7 +3672,7 @@
     "performance": {
       "arc_easy": 0.5922,
       "arc_challenge": 0.3447,
-      "windograde": 0.5975,
+      "winogrande": 0.5975,
       "openbookqa": 0.386,
       "boolq": 0.5801,
       "piqa": 0.7535,
@@ -3752,7 +3752,7 @@
     "performance": {
       "arc_easy": 0.5842,
       "arc_challenge": 0.3404,
-      "windograde": 0.6125,
+      "winogrande": 0.6125,
       "openbookqa": 0.37,
       "boolq": 0.5557,
       "piqa": 0.7514,
@@ -3832,7 +3832,7 @@
     "performance": {
       "arc_easy": 0.6048,
       "arc_challenge": 0.3336,
-      "windograde": 0.5885,
+      "winogrande": 0.5885,
       "openbookqa": 0.392,
       "boolq": 0.564,
       "piqa": 0.7573,
@@ -3912,7 +3912,7 @@
     "performance": {
       "arc_easy": 0.5898,
       "arc_challenge": 0.3362,
-      "windograde": 0.6014,
+      "winogrande": 0.6014,
       "openbookqa": 0.396,
       "boolq": 0.5991,
       "piqa": 0.7557,
@@ -3992,7 +3992,7 @@
     "performance": {
       "arc_easy": 0.6376,
       "arc_challenge": 0.3711,
-      "windograde": 0.6338,
+      "winogrande": 0.6338,
       "openbookqa": 0.406,
       "boolq": 0.633,
       "piqa": 0.7682,
@@ -4072,7 +4072,7 @@
     "performance": {
       "arc_easy": 0.6343,
       "arc_challenge": 0.3695,
-      "windograde": 0.6369,
+      "winogrande": 0.6369,
       "openbookqa": 0.402,
       "boolq": 0.6486,
       "piqa": 0.7688,
@@ -4152,7 +4152,7 @@
     "performance": {
       "arc_easy": 0.6452,
       "arc_challenge": 0.3788,
-      "windograde": 0.6346,
+      "winogrande": 0.6346,
       "openbookqa": 0.408,
       "boolq": 0.645,
       "piqa": 0.7666,
@@ -4232,7 +4232,7 @@
     "performance": {
       "arc_easy": 0.6469,
       "arc_challenge": 0.3737,
-      "windograde": 0.633,
+      "winogrande": 0.633,
       "openbookqa": 0.404,
       "boolq": 0.6483,
       "piqa": 0.7693,
@@ -4312,7 +4312,7 @@
     "performance": {
       "arc_easy": 0.6456,
       "arc_challenge": 0.3695,
-      "windograde": 0.6393,
+      "winogrande": 0.6393,
       "openbookqa": 0.406,
       "boolq": 0.6483,
       "piqa": 0.7699,
@@ -4392,7 +4392,7 @@
     "performance": {
       "arc_easy": 0.6524,
       "arc_challenge": 0.3754,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.408,
       "boolq": 0.6691,
       "piqa": 0.7693,
@@ -4472,7 +4472,7 @@
     "performance": {
       "arc_easy": 0.6469,
       "arc_challenge": 0.3737,
-      "windograde": 0.6393,
+      "winogrande": 0.6393,
       "openbookqa": 0.408,
       "boolq": 0.6437,
       "piqa": 0.7688,
@@ -4552,7 +4552,7 @@
     "performance": {
       "arc_easy": 0.641,
       "arc_challenge": 0.3797,
-      "windograde": 0.633,
+      "winogrande": 0.633,
       "openbookqa": 0.408,
       "boolq": 0.6459,
       "piqa": 0.7671,
@@ -4632,7 +4632,7 @@
     "performance": {
       "arc_easy": 0.6439,
       "arc_challenge": 0.3737,
-      "windograde": 0.6393,
+      "winogrande": 0.6393,
       "openbookqa": 0.4,
       "boolq": 0.6425,
       "piqa": 0.7688,
@@ -4712,7 +4712,7 @@
     "performance": {
       "arc_easy": 0.6376,
       "arc_challenge": 0.3643,
-      "windograde": 0.6354,
+      "winogrande": 0.6354,
       "openbookqa": 0.402,
       "boolq": 0.6498,
       "piqa": 0.7671,
@@ -4792,7 +4792,7 @@
     "performance": {
       "arc_easy": 0.6448,
       "arc_challenge": 0.3695,
-      "windograde": 0.6385,
+      "winogrande": 0.6385,
       "openbookqa": 0.404,
       "boolq": 0.645,
       "piqa": 0.7688,
@@ -4872,7 +4872,7 @@
     "performance": {
       "arc_easy": 0.6288,
       "arc_challenge": 0.3754,
-      "windograde": 0.6322,
+      "winogrande": 0.6322,
       "openbookqa": 0.406,
       "boolq": 0.6517,
       "piqa": 0.7666,
@@ -4952,7 +4952,7 @@
     "performance": {
       "arc_easy": 0.6473,
       "arc_challenge": 0.366,
-      "windograde": 0.6346,
+      "winogrande": 0.6346,
       "openbookqa": 0.408,
       "boolq": 0.6443,
       "piqa": 0.7699,
@@ -5032,7 +5032,7 @@
     "performance": {
       "arc_easy": 0.6465,
       "arc_challenge": 0.3754,
-      "windograde": 0.6306,
+      "winogrande": 0.6306,
       "openbookqa": 0.408,
       "boolq": 0.6486,
       "piqa": 0.7704,
@@ -5112,7 +5112,7 @@
     "performance": {
       "arc_easy": 0.6162,
       "arc_challenge": 0.3746,
-      "windograde": 0.6267,
+      "winogrande": 0.6267,
       "openbookqa": 0.4,
       "boolq": 0.659,
       "piqa": 0.7682,
@@ -5192,7 +5192,7 @@
     "performance": {
       "arc_easy": 0.6561,
       "arc_challenge": 0.3873,
-      "windograde": 0.6172,
+      "winogrande": 0.6172,
       "openbookqa": 0.41,
       "boolq": 0.63,
       "piqa": 0.7666,
@@ -5272,7 +5272,7 @@
     "performance": {
       "arc_easy": 0.6284,
       "arc_challenge": 0.3677,
-      "windograde": 0.6322,
+      "winogrande": 0.6322,
       "openbookqa": 0.398,
       "boolq": 0.6648,
       "piqa": 0.7682,
@@ -5352,7 +5352,7 @@
     "performance": {
       "arc_easy": 0.6532,
       "arc_challenge": 0.3771,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.41,
       "boolq": 0.6443,
       "piqa": 0.7715,
@@ -5432,7 +5432,7 @@
     "performance": {
       "arc_easy": 0.6397,
       "arc_challenge": 0.3729,
-      "windograde": 0.6361,
+      "winogrande": 0.6361,
       "openbookqa": 0.398,
       "boolq": 0.6581,
       "piqa": 0.7699,
@@ -5512,7 +5512,7 @@
     "performance": {
       "arc_easy": 0.6452,
       "arc_challenge": 0.3865,
-      "windograde": 0.6204,
+      "winogrande": 0.6204,
       "openbookqa": 0.4,
       "boolq": 0.6728,
       "piqa": 0.765,
@@ -5592,7 +5592,7 @@
     "performance": {
       "arc_easy": 0.5871,
       "arc_challenge": 0.337,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.398,
       "boolq": 0.6373,
       "piqa": 0.7465,
@@ -5672,7 +5672,7 @@
     "performance": {
       "arc_easy": 0.5926,
       "arc_challenge": 0.3464,
-      "windograde": 0.6251,
+      "winogrande": 0.6251,
       "openbookqa": 0.384,
       "boolq": 0.6352,
       "piqa": 0.7465,
@@ -5752,7 +5752,7 @@
     "performance": {
       "arc_easy": 0.5871,
       "arc_challenge": 0.3379,
-      "windograde": 0.6227,
+      "winogrande": 0.6227,
       "openbookqa": 0.386,
       "boolq": 0.6373,
       "piqa": 0.747,
@@ -5832,7 +5832,7 @@
     "performance": {
       "arc_easy": 0.5859,
       "arc_challenge": 0.3404,
-      "windograde": 0.6219,
+      "winogrande": 0.6219,
       "openbookqa": 0.394,
       "boolq": 0.6324,
       "piqa": 0.7492,
@@ -5912,7 +5912,7 @@
     "performance": {
       "arc_easy": 0.5981,
       "arc_challenge": 0.3302,
-      "windograde": 0.6227,
+      "winogrande": 0.6227,
       "openbookqa": 0.39,
       "boolq": 0.6465,
       "piqa": 0.7519,
@@ -5992,7 +5992,7 @@
     "performance": {
       "arc_easy": 0.5825,
       "arc_challenge": 0.3404,
-      "windograde": 0.6298,
+      "winogrande": 0.6298,
       "openbookqa": 0.372,
       "boolq": 0.6621,
       "piqa": 0.7421,
@@ -6072,7 +6072,7 @@
     "performance": {
       "arc_easy": 0.5976,
       "arc_challenge": 0.3345,
-      "windograde": 0.6259,
+      "winogrande": 0.6259,
       "openbookqa": 0.394,
       "boolq": 0.6443,
       "piqa": 0.7486,
@@ -6152,7 +6152,7 @@
     "performance": {
       "arc_easy": 0.5699,
       "arc_challenge": 0.3396,
-      "windograde": 0.629,
+      "winogrande": 0.629,
       "openbookqa": 0.384,
       "boolq": 0.6422,
       "piqa": 0.7437,
@@ -6232,7 +6232,7 @@
     "performance": {
       "arc_easy": 0.601,
       "arc_challenge": 0.3362,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.402,
       "boolq": 0.6272,
       "piqa": 0.7437,
@@ -6312,7 +6312,7 @@
     "performance": {
       "arc_easy": 0.5741,
       "arc_challenge": 0.3387,
-      "windograde": 0.6314,
+      "winogrande": 0.6314,
       "openbookqa": 0.376,
       "boolq": 0.644,
       "piqa": 0.7421,
@@ -6392,7 +6392,7 @@
     "performance": {
       "arc_easy": 0.5846,
       "arc_challenge": 0.3413,
-      "windograde": 0.6267,
+      "winogrande": 0.6267,
       "openbookqa": 0.394,
       "boolq": 0.6116,
       "piqa": 0.7485,
@@ -6472,7 +6472,7 @@
     "performance": {
       "arc_easy": 0.6141,
       "arc_challenge": 0.3524,
-      "windograde": 0.6361,
+      "winogrande": 0.6361,
       "openbookqa": 0.39,
       "boolq": 0.6569,
       "piqa": 0.7633,
@@ -6552,7 +6552,7 @@
     "performance": {
       "arc_easy": 0.6098,
       "arc_challenge": 0.3532,
-      "windograde": 0.6409,
+      "winogrande": 0.6409,
       "openbookqa": 0.394,
       "boolq": 0.6291,
       "piqa": 0.759,
@@ -6632,7 +6632,7 @@
     "performance": {
       "arc_easy": 0.6056,
       "arc_challenge": 0.3567,
-      "windograde": 0.6377,
+      "winogrande": 0.6377,
       "openbookqa": 0.392,
       "boolq": 0.6196,
       "piqa": 0.7606,
@@ -6712,7 +6712,7 @@
     "performance": {
       "arc_easy": 0.6111,
       "arc_challenge": 0.3498,
-      "windograde": 0.6354,
+      "winogrande": 0.6354,
       "openbookqa": 0.398,
       "boolq": 0.6297,
       "piqa": 0.759,
@@ -6792,7 +6792,7 @@
     "performance": {
       "arc_easy": 0.6077,
       "arc_challenge": 0.3635,
-      "windograde": 0.6093,
+      "winogrande": 0.6093,
       "openbookqa": 0.394,
       "boolq": 0.6743,
       "piqa": 0.7497,
@@ -6872,7 +6872,7 @@
     "performance": {
       "arc_easy": 0.6086,
       "arc_challenge": 0.3464,
-      "windograde": 0.633,
+      "winogrande": 0.633,
       "openbookqa": 0.398,
       "boolq": 0.6443,
       "piqa": 0.7584,
@@ -6952,7 +6952,7 @@
     "performance": {
       "arc_easy": 0.5976,
       "arc_challenge": 0.3515,
-      "windograde": 0.644,
+      "winogrande": 0.644,
       "openbookqa": 0.39,
       "boolq": 0.6321,
       "piqa": 0.7573,
@@ -7032,7 +7032,7 @@
     "performance": {
       "arc_easy": 0.6002,
       "arc_challenge": 0.3609,
-      "windograde": 0.6164,
+      "winogrande": 0.6164,
       "openbookqa": 0.404,
       "boolq": 0.6719,
       "piqa": 0.7454,
@@ -7112,7 +7112,7 @@
     "performance": {
       "arc_easy": 0.6191,
       "arc_challenge": 0.3609,
-      "windograde": 0.6125,
+      "winogrande": 0.6125,
       "openbookqa": 0.388,
       "boolq": 0.6694,
       "piqa": 0.7459,
@@ -7192,7 +7192,7 @@
     "performance": {
       "arc_easy": 0.6086,
       "arc_challenge": 0.3584,
-      "windograde": 0.6417,
+      "winogrande": 0.6417,
       "openbookqa": 0.394,
       "boolq": 0.6609,
       "piqa": 0.7579,
@@ -7272,7 +7272,7 @@
     "performance": {
       "arc_easy": 0.6229,
       "arc_challenge": 0.3695,
-      "windograde": 0.6077,
+      "winogrande": 0.6077,
       "openbookqa": 0.398,
       "boolq": 0.6725,
       "piqa": 0.7476,
@@ -7352,7 +7352,7 @@
     "performance": {
       "arc_easy": 0.6263,
       "arc_challenge": 0.3677,
-      "windograde": 0.6204,
+      "winogrande": 0.6204,
       "openbookqa": 0.396,
       "boolq": 0.6315,
       "piqa": 0.7595,
@@ -7432,7 +7432,7 @@
     "performance": {
       "arc_easy": 0.6145,
       "arc_challenge": 0.366,
-      "windograde": 0.629,
+      "winogrande": 0.629,
       "openbookqa": 0.386,
       "boolq": 0.6404,
       "piqa": 0.7579,

@@ -24,8 +24,11 @@ class PerformancePredictor(nn.Module):
                             batch_first=True, bidirectional=False)
         # self.attention = nn.Linear(64, t)
 
-        # relu activate
-        self.relu = nn.ReLU()
+        # neck
+        self.neck = nn.Sequential(
+            nn.Linear(in_features=hidden_size, out_features=hidden_size),
+            nn.ReLU()
+        )
 
         # task heads
         self.task_heads = nn.ModuleList([
@@ -56,7 +59,7 @@ class PerformancePredictor(nn.Module):
 
         # 只取lstm最后一层输出
         x = x[:, -1, :]
-        x = self.relu(x)
+        x = self.neck(x)
 
         output = torch.cat([
             task_head(x) for task_head in self.task_heads

@@ -6,7 +6,7 @@ from utils.utils import load_layer_info
 
 
 class PerformanceDataset(Dataset):
-    def __init__(self, file_path, mode="train"):
+    def __init__(self, file_path, prune_path, mode="train"):
         super(PerformanceDataset, self).__init__()
         json_file = json.load(open(file_path, "r+"))
         self.data = []
@@ -23,12 +23,28 @@ class PerformanceDataset(Dataset):
         elif mode == "test":
             self.data = self.data[n_split:]
 
-        model_list = [
-            "llama7b-0.20", "llama7b-0.25", "llama7b-0.30", "llama7b-0.50",
-            "vicuna7b-0.20", "vicuna7b-0.25", "vicuna7b-0.30", "vicuna7b-0.50",
-        ]
+        self.model_map = load_layer_info(prune_path)
 
-        self.model_map = load_layer_info(model_list)
+    def statistics(self):
+        data = self.data
+
+        metrics = ['arc_easy', 'arc_challenge', 'winogrande', 'openbookqa', 'boolq', 'piqa', 'hellaswag']
+
+        result = {}
+
+        for d in data:
+            for metric in metrics:
+                if not metric in result.keys():
+                    result[metric] = []
+
+                result[metric].append(d["performance"][metric])
+
+        print(result)
+
+        for key, value in result.items():
+            v = np.array(value)
+            print("%s, 最大值: %.6f, 最小值: %.6f, 平均值: %.6f, 中位数: %.6f, 方差: %.6f" %
+                  (key, np.max(v), np.min(v), np.mean(v), np.median(v), np.std(v)))
 
     def __len__(self):
         return len(self.data)
@@ -58,3 +74,13 @@ class PerformanceDataset(Dataset):
         performance = torch.from_numpy(np.array(list(performance.values())))
 
         return (layer_info, rank_list, prune_list, performance)
+
+
+if __name__ == "__main__":
+    train_set = PerformanceDataset("./merged_file_v1.json", "../rankadaptor/prune_log/local/")
+    train_set.statistics()
+
+    # a = np.array([1, 2, 3])
+    # b = np.array([4, 5, 6])
+    #
+    # print(a + b)

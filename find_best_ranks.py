@@ -28,7 +28,7 @@ def get_model_setting(file_path):
 # 获取编码器
 predictor = PerformancePredictor().double()
 predictor.load_state_dict(torch.load("./output/performance_weights.pth"))
-model_settings = get_model_setting("./dataset/merged_file_revise.json")
+model_settings = get_model_setting("dataset/merged_file_v1.json")
 
 for model in model_settings:
     name = model["name"]

@@ -1,17 +1,18 @@
 import json
 import random
-import matplotlib.pyplot as plt
+
 import torch
+
+from model.nas_model2 import PolicyNetwork, NASAgent, NASEnvironment
 from model.performance_preditor import PerformancePredictor, PositionalEncoder
-from model.nas_model import PolicyNetwork, NASAgent, NASEnvironment
 from utils.utils import read_layer_info
-from torch.autograd import Variable
+from utils.plot import draw_loss_plot
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 action_space = [2, 4, 6, 8, 10, 12, 14, 16]
 embed_size = 64
-num_epoch = 1
-num_episode = 1
+num_epoch = 10
+num_episode = 10
 batch_size = 4
 
 # 获取编码器
@@ -50,6 +51,7 @@ def build_batch(data_list, batch_size):
     names = []
     prune_lists = []
     layer_infos = []
+    budget_lists = []
 
     for i in range(batch_size):
         model = random.choice(data_list)
@@ -62,19 +64,12 @@ def build_batch(data_list, batch_size):
         names.append(name)
         prune_lists.append(prune_list)
         layer_infos.append(layer_info)
+        budget_lists.append(torch.tensor([256], dtype=torch.float64, device=device))
 
     return (names,
             torch.stack(layer_infos),
-            torch.stack(prune_lists))
-
-
-# draw loss plot
-def draw_loss_plot(x, y, name="training"):
-    plt.plot(x, y, label=name + " loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("loss")
-    plt.legend()
-    plt.show()
+            torch.stack(prune_lists),
+            torch.stack(budget_lists))
 
 
 # 模型设置
@@ -85,25 +80,24 @@ train_rewards = []
 
 for epoch in range(num_epoch):
     for episode in range(num_episode):
-        names, layer_infors, prune_lists = build_batch(data_list=model_settings, batch_size=batch_size)
+        names, layer_infors, prune_lists, budget_list = build_batch(data_list=model_settings, batch_size=batch_size)
 
         # embedding as default state
         state = (layer_infors, prune_lists)
 
         # logits, actions = agent.select_action(state)
-        probs, log_probs, actions = agent.select_action(state)
-        reward = env.step(actions, layer_infors, prune_lists)
+        probs, log_probs, actions = agent.select_action(state, budget_list)
+        reward = env.step(actions, layer_infors, prune_lists, budget_list)
 
-        # print(probs)
-
-        # log_logits = logits.gather(dim=1, index=actions).squeeze(1)
         loss = agent.update_policy(log_probs, reward)
 
+        print(actions)
+
         print("models %s: epoch: %d, episode: %d, reward: %s, loss: %s \n\n"
-              % (names, epoch, episode, reward.detach().item(), loss.detach().item()))
+              % (names, epoch, episode, torch.sum(reward).detach().item(), loss.detach().item()))
 
         train_loss.append(loss.detach().item())
-        train_rewards.append(reward.detach().item())
+        train_rewards.append(torch.sum(reward).detach().item())
 
-draw_loss_plot(range(num_epoch * num_episode), train_loss, "loss")
-draw_loss_plot(range(num_epoch * num_episode), train_rewards, "reward")
+draw_loss_plot(y=[train_loss], title="training loss", labels="total")
+draw_loss_plot(y=[train_rewards], title="training reward", labels="total")

@@ -32,6 +32,7 @@ class Profiler():
             U, S, V = np.linalg.svd(weight, full_matrices=False)
 
             layer_encoding.append(S.tolist())
+            print(layer_position, "finish, ", U.shape, S.shape, V.shape)
 
         return layer_encoding
         # return {
