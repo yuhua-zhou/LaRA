@@ -94,6 +94,10 @@ class NASEnvironment:
 
         torch.set_printoptions(precision=8)
         print(output)
+
+
+        print(reward)
+
         return self.scale_factor * reward + penalty
 
 

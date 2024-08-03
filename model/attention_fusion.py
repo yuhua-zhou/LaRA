@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 
-
 class FeatureFusion(nn.Module):
     def __init__(self, embedding_dim, feature_nums=3, num_heads=8):
         super().__init__()
@@ -12,6 +11,7 @@ class FeatureFusion(nn.Module):
         self.attn = nn.MultiheadAttention(embedding_dim, num_heads=num_heads)
         self.layer_norm = nn.LayerNorm(embedding_dim)
         self.fc = nn.Linear(embedding_dim * feature_nums, embedding_dim)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
         batch_size, seq_len, feat_len, feat_embed = x.shape
@@ -27,12 +27,14 @@ class FeatureFusion(nn.Module):
 
         output, _ = self.attn(queries, keys, values)
 
+        # output = x
+
         output = output.view(batch_size, seq_len, feat_len, feat_embed)
         output = self.layer_norm(output)
         output = output.view(batch_size, seq_len, -1)
         output = self.fc(output)
+        # output = self.relu(output)
         return output
-
 
 if __name__ == "__main__":
     batch_size = 2
@@ -50,6 +52,3 @@ if __name__ == "__main__":
     fuser = FeatureFusion(embedding_dim)
     fusion_feature = fuser(fusion_feature)
     print(fusion_feature.shape)
-    # print(fusion_feature)
-    # [64, 32, 3, 64]
-    # [64, 3, 64]

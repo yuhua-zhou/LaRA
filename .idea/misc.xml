@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="mask2former" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="V100" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="4090" project-jdk-type="Python SDK" />
 </project>

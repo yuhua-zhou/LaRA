@@ -3,21 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .attention_fusion import FeatureFusion
-from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder
-
-
-class BudgetEncoder(nn.Module):
-    def __init__(self, hidden_size):
-        super().__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(1, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, hidden_size),
-            nn.ReLU()
-        )
-
-    def forward(self, x):
-        return self.fc(x)
+from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, BudgetEncoder
 
 
 class PolicyNetwork(nn.Module):
@@ -79,7 +65,7 @@ class PolicyNetwork(nn.Module):
 
 
 class NASEnvironment:
-    def __init__(self, action_space, predictor, scale_factor=1e2, device="cpu"):
+    def __init__(self, action_space, predictor, scale_factor=10, device="cpu"):
         super().__init__()
         self.action_space = action_space
         self.scale_factor = scale_factor
@@ -92,16 +78,22 @@ class NASEnvironment:
 
         ranks_sum = torch.sum(ranks, dim=1).unsqueeze(1)
 
-        ranks_sum = self.normalize_ranks(ranks_sum, ranks.shape[1])
-        budget_list = self.normalize_ranks(budget_list, ranks.shape[1])
+        print(ranks_sum, budget_list)
+
+        # ranks_sum = self.normalize_ranks(ranks_sum, ranks.shape[1])
+        # budget_list = self.normalize_ranks(budget_list, ranks.shape[1])
 
         # evaluate_architecture
-        performance = self.evaluate_architecture(ranks, layer_info, prune_list)
+        # performance = self.evaluate_architecture(ranks, layer_info, prune_list)
 
-        penalty = torch.abs(ranks_sum - budget_list)
-        penalty = -torch.log(1 + penalty)
+        penalty = F.mse_loss(ranks_sum, budget_list)
 
-        return performance + penalty
+        # penalty = -self.scale_factor * torch.log(1 + penalty)
+        penalty = -self.scale_factor * penalty
+
+        # return performance + self.scale_factor * penalty
+
+        return penalty
 
     def normalize_ranks(self, ranks, seq_len=1):
         min_rank = seq_len * self.action_space[0]
@@ -117,20 +109,24 @@ class NASEnvironment:
         output = self.predictor(layer_info, rank_list, prune_list)
         performance = torch.mean(output)
 
+        torch.set_printoptions(precision=8)
+        # print(output)
+        # print(performance)
+
         return performance
 
 
 class NASAgent:
-    def __init__(self, policy_net, env, gamma=0.99, lr=1e-4):
+    def __init__(self, policy_net, env, gamma=0.99, lr=1e-5):
         self.policy_net = policy_net
         self.env = env
         self.gamma = gamma
         self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=lr)
 
     def select_action(self, state, budget_list):
-        layer_infors, prune_lists = state
+        layer_infos, prune_lists = state
 
-        logits = self.policy_net(layer_infors, prune_lists, budget_list)
+        logits = self.policy_net(layer_infos, prune_lists, budget_list)
         probs = F.softmax(logits, dim=2)
 
         dist = torch.distributions.Categorical(probs)
@@ -145,6 +141,7 @@ class NASAgent:
     def update_policy(self, log_logits, rewards):
         discounted_rewards = rewards
         policy_loss = (discounted_rewards * log_logits).mean()
+        print(policy_loss)
 
         self.optimizer.zero_grad()
         policy_loss.backward()

@@ -1,6 +1,9 @@
-import torch.nn as nn
-import torch
 import math
+
+import torch
+import torch.nn as nn
+
+from utils.utils import normalize
 
 
 class PositionalEncoder(nn.Module):
@@ -34,10 +37,18 @@ class LayerPruneEncoder(nn.Module):
 
     def __init__(self, embed_size):
         super(LayerPruneEncoder, self).__init__()
+        # self.encode = torch.ones((1, embed_size))
         self.encode = nn.Linear(1, embed_size)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
-        return self.encode(x)
+        x = self.encode(x)
+        # x = self.relu(x)
+        return x
+
+        # self.encode = self.encode.to(x.device)
+        # x = x * self.encode
+        # return x
 
 
 class LayerRankEncoder(nn.Module):
@@ -50,19 +61,93 @@ class LayerRankEncoder(nn.Module):
 
     def __init__(self, embed_size):
         super(LayerRankEncoder, self).__init__()
+        # self.encode = torch.ones((1, embed_size))
+
         self.encode = nn.Linear(1, embed_size)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
-        return self.encode(x)
+        x = (x - 2.0) / 14.0
+        x = self.encode(x)
+        # x = self.relu(x)
+        return x
+
+        # self.encode = self.encode.to(x.device)
+        # x = (x - 2.0) / 14.0
+        # x = self.encode * x
+        # return x
 
 
 class LayerInfoEncoder(nn.Module):
     def __init__(self, output_size):
         super(LayerInfoEncoder, self).__init__()
-        self.down_sample = nn.AdaptiveAvgPool2d((1, output_size))
-        self.encode = nn.Linear(output_size, output_size)
+
+        self.hidden = output_size
+        self.down_sample = nn.AdaptiveAvgPool1d(output_size)
+
+        self.encode = nn.Sequential(
+            nn.Linear(output_size, output_size),
+            # nn.Dropout(0.05),
+            # nn.ReLU(),
+            # nn.Linear(output_size, output_size)
+        )
 
     def forward(self, x):
+        x = x[:, :, :, :self.hidden].clone()
+        batch, seq_len, weight_num, hidden = x.shape
+
+        x = x.view(batch, seq_len, weight_num * hidden)
         x = self.down_sample(x)
-        x = self.encode(x)
+
+        x = normalize(x, mean=3.667495956768107, std=1.6198784927662087, max=22.479613939921062, min=1.3181705474853516)
+
+        # x = self.encode(x)
         return x
+
+    # def __init__(self, output_size):
+    #     super(LayerInfoEncoder, self).__init__()
+    #
+    #     self.hidden = output_size
+    #     self.down_sample = nn.AdaptiveAvgPool1d(output_size)
+    #
+    #     self.encode = nn.Sequential(
+    #         nn.Linear(output_size, output_size),
+    #     )
+    #
+    # def forward(self, x):
+    #     batch, seq_len, weight_num, width, height = x.shape
+    #
+    #     x = x.view(batch, seq_len, -1)
+    #     x = self.down_sample(x)
+    #
+    #     x = self.encode(x)
+    #     return x
+
+
+class BudgetEncoder(nn.Module):
+    def __init__(self, hidden_size):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(1, hidden_size // 2),
+            # nn.BatchNorm1d(hidden_size // 2),
+            nn.ReLU(),
+            nn.Linear(hidden_size // 2, hidden_size),
+        )
+
+    def forward(self, x):
+        return self.fc(x)
+
+
+if __name__ == '__main__':
+    # x = torch.randn(64, 32, 6, 4096)
+    # encoder = LayerInfoEncoder(128)
+    # print(encoder(x).shape)
+
+    # x = torch.randn(64, 32, 6, 256, 256)
+    # encoder = LayerInfoEncoder(128)
+    # print(encoder(x).shape)
+
+    x = torch.randn(1, 1)
+    encoder = BudgetEncoder(hidden_size=64)
+    x = encoder(x)
+    print(x.shape)

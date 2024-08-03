@@ -1,13 +1,14 @@
-import torch.nn as nn
-import torch
-import torch.nn.functional as F
 import numpy as np
-from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, LayerRankEncoder
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
 from .attention_fusion import FeatureFusion
+from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, LayerRankEncoder
 
 
 class PerformancePredictor(nn.Module):
-    def __init__(self, input_size=64, hidden_size=128, num_layers=2, num_tasks=7):
+    def __init__(self, input_size=64, hidden_size=128, num_layers=1, dropout=0.05, num_tasks=7):
         super(PerformancePredictor, self).__init__()
 
         # encoders
@@ -22,20 +23,29 @@ class PerformancePredictor(nn.Module):
         # lstm
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers,
                             batch_first=True, bidirectional=False)
-        # self.attention = nn.Linear(64, t)
 
         # neck
         self.neck = nn.Sequential(
             nn.Linear(in_features=hidden_size, out_features=hidden_size),
-            nn.ReLU()
+            nn.BatchNorm1d(hidden_size),
+            nn.ReLU(),
+            nn.Dropout(dropout),
         )
 
         # task heads
         self.task_heads = nn.ModuleList([
-            nn.Linear(in_features=hidden_size, out_features=1) for _ in range(num_tasks)
+            nn.Sequential(
+                nn.Linear(in_features=hidden_size, out_features=hidden_size // 2),
+                nn.BatchNorm1d(hidden_size // 2),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(in_features=hidden_size // 2, out_features=1),
+                # nn.ReLU()
+            )
+            for _ in range(num_tasks)
         ])
 
-        self.output = nn.Linear(in_features=hidden_size, out_features=num_tasks)
+        self._init_weights()
 
     # 需要优化
     def get_input_embedding(self, layer_info, rank_list, prune_list):
@@ -54,7 +64,9 @@ class PerformancePredictor(nn.Module):
         # input x = [batch, seq_len, input_size]
 
         x = self.get_input_embedding(layer_info, rank_list, prune_list)
-        x = self.att_scaled_dot_seq_len(x)
+        # x = self.att_scaled_dot_seq_len(x)
+        # print(x)
+
         x, _ = self.lstm(x)
 
         # 只取lstm最后一层输出
@@ -66,6 +78,24 @@ class PerformancePredictor(nn.Module):
         ], dim=1)
 
         return output
+
+    def _init_weights(self):
+        # nn.init.kaiming_normal(self.rnn.weight, mode='fan_in', nonlinearity='relu')
+        for layer in self.neck.modules():
+            if type(layer) == nn.Linear:
+                nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu')
+
+        for head in self.task_heads:
+            for layer in head.modules():
+                if type(layer) == nn.Linear:
+                    nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu')
+
+        # 使用Kaiming初始化
+        for name, param in self.lstm.named_parameters():
+            if 'weight_ih' in name or 'weight_hh' in name:
+                nn.init.kaiming_normal_(param, a=0, mode='fan_in', nonlinearity='leaky_relu')
+            elif 'bias_ih' in name or 'bias_hh' in name:
+                nn.init.constant_(param, val=0)
 
     def att_scaled_dot_seq_len(self, x):
         # b, s, input_size / b, s, hidden_size
