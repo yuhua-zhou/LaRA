@@ -1,12 +1,12 @@
-from model.loss import WeightedLogCoshLoss, WeightedMSELoss
-from model.performance_preditor import PerformancePredictor
+from model.loss import WeightedMSELoss
+from model.performance.performance_preditor import PerformancePredictor
 from dataset.dataset import PerformanceDataset
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 import torch
 
 # hyper-parameters
-device = "cuda:1" if torch.cuda.is_available() else "cpu"
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 dataset_path = "dataset/merged_file_v2.json"
 prune_path = "./rankadaptor/prune_log/local/"
 batch_size = 1
@@ -17,8 +17,8 @@ test_set.statistics()
 test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
 # create model
-net = PerformancePredictor(input_size=64, hidden_size=32).double().to(device)
-net.load_state_dict(torch.load("./output/performance_weights.pth"))
+net = PerformancePredictor(input_size=64, hidden_size=128).double().to(device)
+net.load_state_dict(torch.load("./output/performance_weights_svd_3090.pth"))
 criterion = WeightedMSELoss()
 
 net.eval()

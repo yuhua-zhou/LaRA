@@ -7,7 +7,7 @@ import torch
 from prettytable import PrettyTable
 from torch.utils.data import Dataset
 
-from utils.utils import load_layer_info, softmax
+from utils.utils import load_layer_info
 
 
 class PerformanceDataset(Dataset):
@@ -21,11 +21,8 @@ class PerformanceDataset(Dataset):
             if "13b" not in item["name"]:
                 self.data.append(item)
 
-        random.seed(20240816)
+        random.seed(20241126)
         random.shuffle(self.data)
-
-        if augment > 0:
-            self.data_augmentation(augment)
 
         n_split = int(9 * len(self.data) / 10)
 
@@ -34,7 +31,11 @@ class PerformanceDataset(Dataset):
         elif mode == "test":
             self.data = self.data[n_split:]
 
-        self.model_map = load_layer_info(prune_path, "pca")
+        if augment > 0:
+            self.data_augmentation(augment)
+
+        self.model_map = load_layer_info(prune_path, "svd")
+        # self.model_map = load_layer_info(prune_path, "pca") # L20
 
     def statistics(self):
         data = self.data
@@ -60,8 +61,16 @@ class PerformanceDataset(Dataset):
 
         # ------------------------- compute data statistics -------------------------
         table = PrettyTable()
-        table.field_names = ["metric", "max", "min", "avg", "mid", "std"]
+        table.field_names = ["metric", "max", "min", "mean", "mid", "std"]
         table.align = 'l'
+
+        # weight for metrics
+        weight = {
+            "equal": [],
+            "std": [],
+            "mean": [],
+            "max_min": []
+        }
 
         metrics = ['arc_easy', 'arc_challenge', 'winogrande', 'openbookqa', 'boolq', 'piqa', 'hellaswag']
         result = {metric: [] for metric in metrics}
@@ -74,7 +83,20 @@ class PerformanceDataset(Dataset):
         for key, value in result.items():
             v = np.array(value)
             table.add_row([key, np.max(v), np.min(v), np.mean(v), np.median(v), np.std(v)])
+            # print('[', np.max(v), ',', np.min(v), ',', np.mean(v), ',', np.std(v), ']')
+
+            weight["equal"].append(1.0)
+            weight["std"].append(np.std(v))
+            weight["mean"].append(np.mean(v))
+            weight["max_min"].append(np.max(v) - np.min(v))
+
         print(table)
+
+        weight = {key: torch.tensor(value) * len(value)
+                       / torch.sum(torch.tensor(value)) for key, value in
+                  weight.items()}
+
+        return weight
 
     def data_augmentation(self, target):
         data = self.data
@@ -88,11 +110,16 @@ class PerformanceDataset(Dataset):
                 result[name] = []
             result[name].append(d)
 
-        prob = {key: 1 / len(value) for key, value in result.items()}
-        values = softmax(list(prob.values()))
-        prob = {key: values[i] for i, key in enumerate(prob.keys())}
+        prob = {key: len(value) for key, value in result.items()}
 
-        # random.seed(None)
+        def _compute_weights(prob):
+            models = list(prob.keys())
+            models.sort()
+
+            weights = np.array([1 / prob[key] for key in models])
+            weights = weights / np.sum(weights)
+
+            return models, weights
 
         def _swap_ranks(d):
             [i, j] = random.sample(range(4, 30), 2)
@@ -104,10 +131,10 @@ class PerformanceDataset(Dataset):
             actions.remove(d[i])
             d[i] = random.choice(actions)
 
-        models = list(prob.keys())
-        weights = list(prob.values())
         for _ in range(target):
+            models, weights = _compute_weights(prob)
             [model] = random.choices(models, weights=weights, k=1)
+
             item = random.choice(result[model])
             new_item = copy.deepcopy(item)
 
@@ -116,6 +143,7 @@ class PerformanceDataset(Dataset):
             else:
                 _modify_ranks(new_item["rank_list"])
 
+            prob[model] += 1
             aug_data.append(new_item)
 
         self.data = self.data + aug_data
@@ -153,12 +181,14 @@ class PerformanceDataset(Dataset):
 
 
 if __name__ == "__main__":
-    file_path = "merged_file_v2.json"
+    file_path = "merged_file_v4.json"
     prune_path = "../rankadaptor/prune_log/local/"
     mode = "train"
     target = 100
     train_set = PerformanceDataset(file_path, prune_path, mode, target)
-    train_set.statistics()
+    weight = train_set.statistics()
+
+    print(weight)
 
     # layer_info, _, _, _ = train_set[0]
     # print(layer_info.shape)

@@ -4,34 +4,34 @@ import numpy as np
 import torch
 import torch.optim as optim
 from torch.autograd import Variable
-from torch.optim.lr_scheduler import LambdaLR, CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
 
 from dataset.dataset import PerformanceDataset
 from model.loss import WeightedMSELoss
-from model.performance_preditor import PerformancePredictor
+from model.performance.performance_preditor import PerformancePredictor
 from utils.plot import draw_loss_plot
 
 # hyper-parameters
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+device = "cuda:3" if torch.cuda.is_available() else "cpu"
 
-num_epoch = 100
-batch_size = 64
+num_epoch = 50
+batch_size = 128
 lr = 1e-3
-dataset_path = "dataset/merged_file_v2.json"
+dataset_path = "dataset/merged_file_v4.json"
 prune_path = "./rankadaptor/prune_log/local/"
 metrics = ['arc_challenge', 'arc_easy', 'boolq', 'hellaswag', 'openbookqa', 'piqa', 'winogrande']
 
 # create dataset
-train_set = PerformanceDataset(dataset_path, prune_path, "train", augment=5000)
+train_set = PerformanceDataset(dataset_path, prune_path, "train", augment=10000)
 train_set.statistics()
 
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-test_set = PerformanceDataset(dataset_path, prune_path, "test")
+test_set = PerformanceDataset(dataset_path, prune_path, "test", augment=500)
 test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
 # create model
-net = PerformancePredictor(input_size=64, hidden_size=128).double().to(device)
+net = PerformancePredictor(input_size=128, hidden_size=128).double().to(device)
 criterion = WeightedMSELoss()
 # criterion = WeightedLogCoshLoss()
 optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-4)
@@ -131,4 +131,15 @@ draw_loss_plot(y=train_loss_list, title="training loss", labels=metrics)
 draw_loss_plot(y=test_loss_list, title="testing loss", labels=metrics)
 draw_loss_plot(y=total_train_test_loss, title="total loss", labels=["total_train", "total_test"])
 
-torch.save(net.state_dict(), "./output/performance_weights.pth")
+import json
+
+result = {
+    "training_loss": train_loss_list.tolist(),
+    "testing_loss": test_loss_list.tolist()
+}
+
+with open("performance.json", "w+") as file:
+    result = json.dumps(result)
+    file.write(result)
+
+# torch.save(net.state_dict(), "./output/performance_weights_svd_V100_new.pth")

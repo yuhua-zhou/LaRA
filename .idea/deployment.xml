@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="4090" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="finance" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
       <paths name="3090">
@@ -13,14 +13,42 @@
       <paths name="4090">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_998" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/LaRA" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="A100">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/mnt/nas_v2/self-define/zhouyuhua/DRALoRA" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="L20">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/autodl-tmp/DRALoRA" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="dolma">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="finance">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/zhouchanghai/DRALoRA" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="v100">
         <serverdata>
           <mappings>
-            <mapping deploy="/mnt/zyh/DRALoRA" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/tmp/pycharm_project_97" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

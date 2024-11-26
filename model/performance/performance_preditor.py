@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .attention_fusion import FeatureFusion
-from .encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, LayerRankEncoder
+from model.attention_fusion import FeatureFusion
+from model.encoders import PositionalEncoder, LayerInfoEncoder, LayerPruneEncoder, LayerRankEncoder
 
 
 class PerformancePredictor(nn.Module):
@@ -24,6 +24,9 @@ class PerformancePredictor(nn.Module):
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers,
                             batch_first=True, bidirectional=False)
 
+        # attention L20
+        # self.attention = nn.Linear(input_size, input_size)
+
         # neck
         self.neck = nn.Sequential(
             nn.Linear(in_features=hidden_size, out_features=hidden_size),
@@ -40,7 +43,7 @@ class PerformancePredictor(nn.Module):
                 nn.ReLU(),
                 nn.Dropout(dropout),
                 nn.Linear(in_features=hidden_size // 2, out_features=1),
-                # nn.ReLU()
+                # nn.ReLU()  # L20加了，4090没加，V100也没加
             )
             for _ in range(num_tasks)
         ])
@@ -64,8 +67,9 @@ class PerformancePredictor(nn.Module):
         # input x = [batch, seq_len, input_size]
 
         x = self.get_input_embedding(layer_info, rank_list, prune_list)
+
+        # L20
         # x = self.att_scaled_dot_seq_len(x)
-        # print(x)
 
         x, _ = self.lstm(x)
 
@@ -101,13 +105,15 @@ class PerformancePredictor(nn.Module):
         # b, s, input_size / b, s, hidden_size
         # x = self.attention(x)  # bsh--->bst
 
-        e = torch.bmm(x, x.permute(0, 2, 1))  # bst*bts=bss
-        e = e / np.sqrt(x.shape[2])
-        attention = F.softmax(e, dim=-1)  # b s s
-        out = torch.bmm(attention, x)  # bss * bst ---> bst
-        out = F.relu(out)
+        x = self.attention(x)
 
-        return out
+        score = torch.bmm(x, x.permute(0, 2, 1))  # bst*bts=bss
+        score = score / np.sqrt(x.shape[2])
+        attention = F.softmax(score, dim=-1)  # b s s
+        context_vector = torch.bmm(attention, x)  # bss * bst ---> bst
+        # context_vector = F.relu(context_vector)
+
+        return context_vector
 
 
 if __name__ == "__main__":

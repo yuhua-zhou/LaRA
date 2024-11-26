@@ -5,7 +5,6 @@ import torch.nn as nn
 
 from utils.utils import normalize
 
-
 class PositionalEncoder(nn.Module):
     """位置编码"""
 
@@ -26,7 +25,6 @@ class PositionalEncoder(nn.Module):
         self.pe = self.pe.to(x.device)
         return x + self.pe[:x.size(1), :]
 
-
 class LayerPruneEncoder(nn.Module):
     # def __init__(self, embed_size, max_len=1000):
     #     super(LayerPruneEncoder, self).__init__()
@@ -37,19 +35,16 @@ class LayerPruneEncoder(nn.Module):
 
     def __init__(self, embed_size):
         super(LayerPruneEncoder, self).__init__()
-        # self.encode = torch.ones((1, embed_size))
-        self.encode = nn.Linear(1, embed_size)
-        self.relu = nn.ReLU()
+        self.encode = torch.ones((1, embed_size))
+        # self.encode = nn.Linear(1, embed_size)
 
     def forward(self, x):
-        x = self.encode(x)
-        # x = self.relu(x)
-        return x
-
-        # self.encode = self.encode.to(x.device)
-        # x = x * self.encode
+        # x = self.encode(x)
         # return x
 
+        self.encode = self.encode.to(x.device)
+        x = x * self.encode
+        return x
 
 class LayerRankEncoder(nn.Module):
     # def __init__(self, embed_size, max_len=1000):
@@ -61,49 +56,54 @@ class LayerRankEncoder(nn.Module):
 
     def __init__(self, embed_size):
         super(LayerRankEncoder, self).__init__()
-        # self.encode = torch.ones((1, embed_size))
+        self.encode = torch.ones((1, embed_size))
 
-        self.encode = nn.Linear(1, embed_size)
-        self.relu = nn.ReLU()
+        # self.encode = nn.Linear(1, embed_size)
 
     def forward(self, x):
-        x = (x - 2.0) / 14.0
-        x = self.encode(x)
-        # x = self.relu(x)
-        return x
-
-        # self.encode = self.encode.to(x.device)
         # x = (x - 2.0) / 14.0
-        # x = self.encode * x
+        # x = self.encode(x)
         # return x
 
+        self.encode = self.encode.to(x.device)
+        x = (x - 2.0) / 14.0
+        x = self.encode * x
+        return x
 
 class LayerInfoEncoder(nn.Module):
+    # SVD
     def __init__(self, output_size):
         super(LayerInfoEncoder, self).__init__()
 
         self.hidden = output_size
         self.down_sample = nn.AdaptiveAvgPool1d(output_size)
 
-        self.encode = nn.Sequential(
-            nn.Linear(output_size, output_size),
-            # nn.Dropout(0.05),
-            # nn.ReLU(),
-            # nn.Linear(output_size, output_size)
-        )
+        # self.encode = nn.Sequential(
+        #     nn.Linear(output_size, output_size),
+        #     # nn.Dropout(0.05),
+        #     # nn.ReLU(),
+        #     # nn.Linear(output_size, output_size)
+        # )
 
     def forward(self, x):
-        x = x[:, :, :, :self.hidden].clone()
-        batch, seq_len, weight_num, hidden = x.shape
+        # x = x[:, :, :, :self.hidden].clone()
+        # batch, seq_len, weight_num, hidden = x.shape
+        #
+        # x = x.view(batch, seq_len, weight_num * hidden)
+        # x = self.down_sample(x)
 
-        x = x.view(batch, seq_len, weight_num * hidden)
+        x = x.mean(dim=2)
         x = self.down_sample(x)
 
-        x = normalize(x, mean=3.667495956768107, std=1.6198784927662087, max=22.479613939921062, min=1.3181705474853516)
+        # hidden = 64
+        # x = normalize(x, mean=3.667495956768107, std=1.6198784927662087, max=22.479613939921062, min=1.3181705474853516)
+        # hidden = 128
+        x = normalize(x, mean=3.275902493126826, std=1.3711524055383268, max=22.479613939921062, min=1.1682074268658955)
 
         # x = self.encode(x)
         return x
 
+    # PCA
     # def __init__(self, output_size):
     #     super(LayerInfoEncoder, self).__init__()
     #
@@ -123,7 +123,6 @@ class LayerInfoEncoder(nn.Module):
     #     x = self.encode(x)
     #     return x
 
-
 class BudgetEncoder(nn.Module):
     def __init__(self, hidden_size):
         super().__init__()
@@ -136,7 +135,6 @@ class BudgetEncoder(nn.Module):
 
     def forward(self, x):
         return self.fc(x)
-
 
 if __name__ == '__main__':
     # x = torch.randn(64, 32, 6, 4096)

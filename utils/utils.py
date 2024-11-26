@@ -47,12 +47,6 @@ def normalize(data, max=1, min=0, mean=0, std=1):
     return data
 
 
-def softmax(x):
-    # 防止数值溢出，减去最大值
-    e_x = np.exp(x - np.max(x))
-    return e_x / e_x.sum()
-
-
 if __name__ == "__main__":
     model_map = load_layer_info("../rankadaptor/prune_log/local/", "pca")
     for key, value in model_map.items():
